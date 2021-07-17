@@ -42,3 +42,19 @@ class ApplicationQuestion(TimestampModel):
     class Meta:
         verbose_name = "Вопрос"
         verbose_name_plural = "Вопросы"
+
+
+class AnswerOptions(TimestampModel):
+    answer_option = models.CharField("Варианты ответов", null=True, blank=True, max_length=255)
+    questions = models.ManyToManyField(
+        ApplicationQuestion,
+        verbose_name="Вопросы",
+        related_name="answer_options",
+    )
+
+    def __str__(self):
+        return f'{self.id}. {self.answer_option}'
+
+    class Meta:
+        verbose_name = "Варианты ответов"
+        verbose_name_plural = "Варианты ответов"

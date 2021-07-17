@@ -1,8 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from apps.csat.models import ApplicationForm, ApplicationQuestion
-
+from apps.csat.models import ApplicationForm, ApplicationQuestion, AnswerOptions
 
 
 class ApplicationQuestionAdmin(admin.ModelAdmin):
@@ -15,4 +14,5 @@ class ApplicationQuestionAdmin(admin.ModelAdmin):
     ordering = ("-created_at",)
 
 admin.site.register(ApplicationForm)
+admin.site.register(AnswerOptions)
 admin.site.register(ApplicationQuestion, ApplicationQuestionAdmin)

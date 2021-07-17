@@ -14,7 +14,7 @@ from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -25,7 +25,7 @@ SECRET_KEY = 'z(n3j=ai%calbh2)vc9+9uqznw$k%%s@b3vu1dkbu0uy^+*1%p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.1.88']
 
 
 # Application definition
@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
     'apps.csat.apps.CsatConfig',
     'apps.core.apps.CoreConfig',
     'apps.sms.apps.SmsConfig',
     'apps.users.apps.UsersConfig',
+    'apps.reports.apps.ReportsConfig'
 ]
 
 MIDDLEWARE = [
@@ -114,6 +116,11 @@ SEND_SMS_FROM_MINUTES = 60
 SEND_SMS_TO_MINUTES = 120
 FREQUENCY_OF_SENDING_SMS = 7
 
+# REPORTS
+REPORT_STORAGE_ROOT = "/reports"
+PRIVATE_STORAGE_ROOT = os.getenv("PRIVATE_STORAGE_ROOT", f"{MEDIA_ROOT}{REPORT_STORAGE_ROOT}")
+
+
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
@@ -137,3 +144,4 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = os.getenv("MEDIA_URL", "/media/")

@@ -1,71 +1,55 @@
 import uuid
 
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.models import PermissionsMixin, UserManager
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
+from django.utils import timezone
 from phonenumber_field.modelfields import PhoneNumberField
+from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
 from apps.core.models import TimestampModel
+from apps.users import RoleTypes
+from apps.users.managers import UserManager
 
 
-class Person(models.Model):
-    iin = models.CharField("ИИН", max_length=12)
-    mobile_phone = PhoneNumberField("Мобильный телефон")
+class NameModel(models.Model):
+    first_name = models.CharField(_("Имя"), max_length=150, null=True)
+    last_name = models.CharField(_("Фамилия"), max_length=150, null=True)
+    middle_name = models.CharField(_("Отчество"), max_length=150, null=True, blank=True)
+    mobile_phone  = PhoneNumberField("Мобильный телефон", null=True)
     class Meta:
-        verbose_name = "Физ. лицо"
-        verbose_name_plural = "Физ. лица"
-
-    def __str__(self):
-        return self.iin
+        abstract = True
 
     @property
-    def user_exists(self):
-        return hasattr(self, "user")
+    def full_name(self) -> str:
+        return " ".join(
+            filter(None, [self.last_name, self.first_name, self.middle_name])
+        )
 
 
-class User(PermissionsMixin, AbstractBaseUser, TimestampModel):
-    email = models.EmailField("Email", unique=True, null=True)
-    person = models.OneToOneField(
-        Person,
-        related_name="user",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        verbose_name="Физ. лицо",
-    )
-    username = models.CharField(max_length=100, unique=True, null=True)
+class User(NameModel, AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(unique=True, null=True)
+
+    role = models.CharField('Роль', choices=RoleTypes.choices, max_length=100, default=RoleTypes.BUYER)
+
     is_active = models.BooleanField("Активный", default=True)
     is_staff = models.BooleanField("Сотрудник", default=False)
-    USERNAME_FIELD = "email"
+
     secret_key = models.UUIDField("Секретный ключ", default=uuid.uuid4, unique=True)
+    created_at = models.DateTimeField("Создан", default=timezone.localtime)
+    updated_at = models.DateTimeField("Обновлен", auto_now=True)
 
     objects = UserManager()
 
-    REQUIRED_FIELDS = ['username']
-    def has_perm(self, perm, obj=None):
-        if not self.is_active:
-            return False
-
-        if self.is_superuser:
-            return True
-
-        return perm in self.get_all_permissions(obj)
-
-    def has_module_perms(self, app_label):
-        if self.is_superuser:
-            return True
-        return self.is_active and any(
-            perm[: perm.index(".")] == app_label for perm in self.get_all_permissions()
-        )
-
     class Meta:
-        verbose_name = "Пользователь"
-        verbose_name_plural = "Пользователи"
+        verbose_name="Пользователь"
+        verbose_name_plural="Пользователи"
 
     def __str__(self):
-        if self.person:
-            return self.person.iin
-        if self.email:
-            return self.email
-        return str(self.pk)
+        return self.email
+
+    USERNAME_FIELD = 'email'
+
+    def get_username(self):
+        return self.email
