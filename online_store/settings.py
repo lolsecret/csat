@@ -25,8 +25,7 @@ SECRET_KEY = 'z(n3j=ai%calbh2)vc9+9uqznw$k%%s@b3vu1dkbu0uy^+*1%p'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.1.88']
-
+ALLOWED_HOSTS = ['0.0.0.0', '127.0.0.1', '192.168.1.88', '192.168.0.15']
 
 # Application definition
 
@@ -42,9 +41,8 @@ INSTALLED_APPS = [
     'apps.core.apps.CoreConfig',
     'apps.sms.apps.SmsConfig',
     'apps.users.apps.UsersConfig',
-    'apps.reports.apps.ReportsConfig'
+    'apps.reports.apps.ReportsConfig',
 ]
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -56,6 +54,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'online_store.urls'
+CELERY_BROKER_URL = 'redis://'
 
 TEMPLATES = [
     {

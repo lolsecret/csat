@@ -32,9 +32,12 @@ class ApplicationQuestion(TimestampModel):
         related_name="questions",
         null=True,
     )
-    answer = JSONField("Ответ", max_length=255, null=True, editable=False)
+    answer = models.CharField("Ответ", max_length=255, null=True, editable=False)
     question = models.CharField("Вопрос", max_length=255)
+
+    date_answer = models.DateTimeField("Дата и время предоставления ответа", null=True, editable=False)
     type = models.CharField(choices=QuestionType.choices, default=QuestionType.RADIO, max_length=255)
+    time_to_answer = models.CharField("Время потраченное на ответ", null=True, max_length=20, editable=False)
 
     def __str__(self):
         return f'{self.question}, {self.type}'

@@ -8,7 +8,7 @@ from celery import shared_task, current_task, Task
 from django.utils.timezone import localtime
 
 from apps.core.tasks import BaseNotifyTask
-from apps.csat.models import ApplicationForm
+from apps.csat.models import ApplicationForm, ApplicationQuestion
 from apps.reports.models import ReportFile
 from apps.reports.storage import private_report_storage
 from apps.users.models import User
@@ -51,14 +51,11 @@ def remove_expired_report(report_uuid: UUID):
 
 class GenerateReportTask(Task):
     name = "internal_api.generate_mobile_report"
-    sheet_name = "Отчет по мобильным СМС"
+    sheet_name = "Отчет по СМС"
 
     def run(self, *args, **kwargs):
         row_num = 1
-        print(User.objects.all())
         user = User.objects.get(id=1)
-        print(user)
-        print("____")
         filter_types = {
             "created_at_begin": kwargs.get("created_at_begin"),
             "created_at_end": kwargs.get("created_at_end")
@@ -66,14 +63,14 @@ class GenerateReportTask(Task):
 
         workbook: Workbook = Workbook()
         worksheet = workbook.new_sheet(self.sheet_name)
-        worksheet.range("A1", "AF1").value = [self.get_columns()]
+        worksheet.range("A1", "AC1").value = [self.get_columns()]
 
-        application_forms = self.get_queryset(kwargs)
+        application_question = self.get_queryset(kwargs)
         print(f"Generate report task({current_task.request.id})")
 
-        for form in application_forms:  # type: CreditContract
+        for question in application_question:
             try:
-                row = self.get_rows(form=form)
+                row = self.get_rows(question=question)
                 row_num += 1
                 for col_num, cell_value in enumerate(row, 1):
                     worksheet.set_cell_value(row_num, col_num, cell_value)
@@ -115,31 +112,25 @@ class GenerateReportTask(Task):
             created_at_end.year, created_at_end.month, created_at_end.day,
             hour=23, minute=59, second=59, tzinfo=tz_info
         )
-        return ApplicationForm.objects.filter(
-            created_at__gte=start_of_day, created_at__lte=end_of_day
+        return ApplicationQuestion.objects.filter(
+            changed_at__gte=start_of_day, changed_at__lte=end_of_day
         ).distinct()
 
     @staticmethod
     def get_columns() -> List[str]:
         return [
-            "ФИО", "Договор", "Дата договора", "СМС сообщение", "Дата отправки", "Статус доставки"
+            "Дата и время предоставления ответа",
+            "Оценка", "Скорость ответа",
         ]
 
     @staticmethod
-    def get_rows(form: ApplicationForm) -> List[Union[str, int]]:
+    def get_rows(question: ApplicationQuestion) -> List[Union[str, int]]:
 
         return [
-            form.created_at,
-            form.changed_at
+            question.date_answer,
+            question.answer,
+            f'{question.time_to_answer} секунд'
         ]
 
-    # def on_success(self, retval, task_id, args, kwargs):
-    #     notify_report_readiness.delay(
-    #         report_uuid=current_task.request.id,
-    #         success=True
-    #     )
-    #
-    # def on_failure(self, exc, task_id, args, kwargs, einfo):
-    #     notify_report_readiness.delay(report_uuid=current_task.request.id)
 
 generate_report_task = app.register_task(GenerateReportTask())
