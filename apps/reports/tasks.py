@@ -129,7 +129,7 @@ class GenerateReportTask(Task):
         return [
             question.date_answer,
             question.answer,
-            f'{question.time_to_answer} секунд'
+            f'{question.time_to_answer // 60} секунд'
         ]
 
 
