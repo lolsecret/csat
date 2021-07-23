@@ -2,6 +2,9 @@ from uuid import uuid4
 
 from django.db import models
 from django.utils import timezone
+from phonenumber_field.modelfields import PhoneNumberField
+
+from apps.users.models import User
 
 try:
     from django.db.models import JSONField
@@ -61,3 +64,27 @@ class AnswerOptions(TimestampModel):
     class Meta:
         verbose_name = "Варианты ответов"
         verbose_name_plural = "Варианты ответов"
+
+
+class UserApplicationForm(TimestampModel):
+    form = models.ForeignKey(
+        ApplicationForm,
+        on_delete=models.CASCADE,
+        verbose_name="Опросник",
+        related_name="user_forms",
+        null=True,
+    )
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name="Пользователь",
+        related_name="application_form",
+        null=True,
+    )
+
+    def __str__(self):
+        return f'Опросник #{self.form.id}. Пользователь - {self.user}'
+
+    class Meta:
+        verbose_name = "Настройка пользователя для опросника"
+        verbose_name_plural = "Настройки пользователей для опросника"

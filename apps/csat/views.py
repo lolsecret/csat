@@ -15,20 +15,24 @@ from apps.sms.services import send_sms
 from apps.users.models import User
 
 
-def get_application(queryset):
-    return queryset.filter(is_expired=True, date_of_published__lte=timezone.localtime()).first()
+def get_application(queryset, user):
+    return queryset.filter(is_expired=True, date_of_published__lte=timezone.localtime(), user_forms__user=user).first()
 
 
 class ApplyApplicationView(GenericAPIView):
     serializer_class = ApplicationApplyFormSerializers
     queryset = ApplicationForm.objects.all()
+
     def post(self, request, *args, **kwargs):
         serializer = ApplyApplicationSerializer(data=request.data)
         serializer.is_valid()
 
-        application = get_application(self.queryset)
+        user = User.objects.filter(id=request.data['person_id'])
+        user.update(mobile_phone=request.data['mobile_phone'])
+
+        application = get_application(self.queryset, user.first())
         mobile_phone = request.data['mobile_phone']
-        person = User.objects.filter(id=request.data['person_id'])
+
 
         sms = SMSMessage.objects.filter(recipients=mobile_phone)
 
@@ -53,10 +57,12 @@ class ApplyApplicationView(GenericAPIView):
 
 
 class ApplicationFormView(GenericAPIView):
-    queryset = ApplicationForm
+    queryset = ApplicationForm.objects.all()
 
     def post(self, request, *args, **kwargs):
         serializer = ApplicationFormRequestSerializer(data=request.data, many=True)
+        serializer.is_valid()
         update_question(request.data)
-        print(request.data)
+
         return Response(status=status.HTTP_200_OK)
+

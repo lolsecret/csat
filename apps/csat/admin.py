@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from apps.csat.models import ApplicationForm, ApplicationQuestion, AnswerOptions
+from apps.csat.models import ApplicationForm, ApplicationQuestion, AnswerOptions, UserApplicationForm
 
 
 class ApplicationQuestionAdmin(admin.ModelAdmin):
@@ -15,4 +15,5 @@ class ApplicationQuestionAdmin(admin.ModelAdmin):
 
 admin.site.register(ApplicationForm)
 admin.site.register(AnswerOptions)
+admin.site.register(UserApplicationForm)
 admin.site.register(ApplicationQuestion, ApplicationQuestionAdmin)
