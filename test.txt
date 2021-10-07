@@ -1,0 +1,382 @@
+Running with gitlab-runner 13.6.0 (8fa89735)
+  on runner01.globerce.com 31213659
+Preparing the "docker" executor
+00:03
+Using Docker executor with image git-registry.globerce.com/docker-images/docker:18.06 ...
+Authenticating with credentials from job payload (GitLab Registry)
+Pulling docker image git-registry.globerce.com/docker-images/docker:18.06 ...
+Using docker image sha256:163a8770288acb45fbce8d83bd7dd569731302a992d0cc6eec076834b14543fd for git-registry.globerce.com/docker-images/docker:18.06 with digest docker@sha256:d0ae46aa08806ffc1c4de70a4eb585df33470643a9d2ccf055ff3ec91ba5b0b0 ...
+Preparing environment
+00:01
+Running on runner-31213659-project-79-concurrent-0 via 5bbca6f6c599...
+Getting source from Git repository
+00:06
+Fetching changes with git depth set to 50...
+Initialized empty Git repository in /builds/trafficwave/fastcash_back/.git/
+Created fresh repository.
+Checking out 9a4cfa2a as dev...
+Skipping Git submodules setup
+Executing "step_script" stage of the job script
+00:56
+$ docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN $CI_REGISTRY
+WARNING! Using --password via the CLI is insecure. Use --password-stdin.
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+Login Succeeded
+$ docker build -t $CI_PROJECT_PATH .
+Step 1/17 : FROM python:3.7
+ ---> b0dee8d708b9
+Step 2/17 : RUN sed -i 's/MinProtocol = TLSv1.2/MinProtocol = TLSv1.0/' /etc/ssl/openssl.cnf
+ ---> Using cache
+ ---> 83194b758f5d
+Step 3/17 : RUN apt-get update && apt-get install -y gettext libcairo2 libpango1.0-dev libzip-dev libharfbuzz-dev libpangoft2-1.0-0 libjpeg-dev libpng-dev
+ ---> Using cache
+ ---> f7800cef91fa
+Step 4/17 : COPY ./requirements/base.txt ./requirements/production.txt /
+ ---> Using cache
+ ---> 56721c1b5f13
+Step 5/17 : RUN pip install --upgrade pip && pip install -r /production.txt
+ ---> Using cache
+ ---> 83efc9f38af7
+Step 6/17 : RUN mkdir -p /static /media /media/analytics /media/analytics_reports /media/service_responses /media/reports /flower_db
+ ---> Using cache
+ ---> 89efef9d9c4b
+Step 7/17 : COPY ./docker-entrypoint.sh /docker-entrypoint.sh
+ ---> Using cache
+ ---> 7d59bc86c640
+Step 8/17 : RUN chmod +x /docker-entrypoint.sh
+ ---> Using cache
+ ---> c7593d834508
+Step 9/17 : ENV DJANGO_SETTINGS_MODULE=config.settings.development
+ ---> Using cache
+ ---> 0126d7b9b32f
+Step 10/17 : ENV PORT 8000
+ ---> Using cache
+ ---> 963dfa1d44c5
+Step 11/17 : ENV STATIC_ROOT /static
+ ---> Using cache
+ ---> b1c777df01ae
+Step 12/17 : ENV MEDIA_ROOT /media
+ ---> Using cache
+ ---> 7bfa257cc013
+Step 13/17 : WORKDIR /app
+ ---> Using cache
+ ---> 0d4a901649b6
+Step 14/17 : COPY . /app
+ ---> e2f1492a4c6d
+Step 15/17 : RUN python manage.py collectstatic --noinput --clear
+ ---> Running in 8fd65f5db3d0
+2815 static files copied to '/static'.
+Removing intermediate container 8fd65f5db3d0
+ ---> 1666e3ddfd8f
+Step 16/17 : RUN python manage.py compilemessages
+ ---> Running in 529a6e75bcab
+processing file django.po in /app/locale/kk/LC_MESSAGES
+processing file django.po in /app/locale/ru/LC_MESSAGES
+Removing intermediate container 529a6e75bcab
+ ---> f50646fc4419
+Step 17/17 : CMD ["/docker-entrypoint.sh"]
+ ---> Running in 5d58523d5978
+Removing intermediate container 5d58523d5978
+ ---> 94ddddf75022
+Successfully built 94ddddf75022
+Successfully tagged trafficwave/fastcash_back:latest
+$ docker tag $CI_PROJECT_PATH $CI_REGISTRY_IMAGE
+$ docker tag $CI_PROJECT_PATH $CI_REGISTRY_IMAGE:$TAG
+$ docker push $CI_REGISTRY_IMAGE
+The push refers to repository [git-registry.globerce.com/trafficwave/fastcash_back]
+92f354c92a68: Preparing
+88d271db166f: Preparing
+4de182001e8c: Preparing
+cd7013949362: Preparing
+dcfa0a2cdb1b: Preparing
+dcfa0a2cdb1b: Preparing
+05b7ed2669c0: Preparing
+c08798c1d88d: Preparing
+9d21cc2a37c5: Preparing
+0f440a88fc4e: Preparing
+21e23f3f07b1: Preparing
+30a013060aff: Preparing
+6522a2852221: Preparing
+56a69ef72608: Preparing
+6f7043721c9b: Preparing
+a933681cf349: Preparing
+f49d20b92dc8: Preparing
+fe342cfe5c83: Preparing
+630e4f1da707: Preparing
+9780f6d83e45: Preparing
+dcfa0a2cdb1b: Waiting
+6522a2852221: Waiting
+56a69ef72608: Waiting
+6f7043721c9b: Waiting
+a933681cf349: Waiting
+f49d20b92dc8: Waiting
+fe342cfe5c83: Waiting
+05b7ed2669c0: Waiting
+630e4f1da707: Waiting
+c08798c1d88d: Waiting
+9780f6d83e45: Waiting
+9d21cc2a37c5: Waiting
+0f440a88fc4e: Waiting
+21e23f3f07b1: Waiting
+30a013060aff: Waiting
+cd7013949362: Layer already exists
+92f354c92a68: Layer already exists
+88d271db166f: Layer already exists
+4de182001e8c: Layer already exists
+05b7ed2669c0: Layer already exists
+dcfa0a2cdb1b: Layer already exists
+c08798c1d88d: Layer already exists
+9d21cc2a37c5: Layer already exists
+0f440a88fc4e: Layer already exists
+21e23f3f07b1: Layer already exists
+6522a2852221: Layer already exists
+30a013060aff: Layer already exists
+56a69ef72608: Layer already exists
+6f7043721c9b: Layer already exists
+f49d20b92dc8: Layer already exists
+fe342cfe5c83: Layer already exists
+630e4f1da707: Layer already exists
+9780f6d83e45: Layer already exists
+a933681cf349: Layer already exists
+dev-61833-8911268e: digest: sha256:c64306c9541a7dc1f84f7ed1602121542e5bbc52f74a68c0382eef2a24587fac size: 4518
+e3d01010f853: Preparing
+8d2fa296514e: Preparing
+8bf53806f0ac: Preparing
+cf7936b2dfc4: Preparing
+dfb174dc936e: Preparing
+dfb174dc936e: Preparing
+64a735a232c6: Preparing
+7365d6a046b9: Preparing
+20beb0639a52: Preparing
+0f440a88fc4e: Preparing
+21e23f3f07b1: Preparing
+30a013060aff: Preparing
+6522a2852221: Preparing
+56a69ef72608: Preparing
+6f7043721c9b: Preparing
+a933681cf349: Preparing
+f49d20b92dc8: Preparing
+fe342cfe5c83: Preparing
+630e4f1da707: Preparing
+9780f6d83e45: Preparing
+dfb174dc936e: Waiting
+64a735a232c6: Waiting
+7365d6a046b9: Waiting
+20beb0639a52: Waiting
+0f440a88fc4e: Waiting
+21e23f3f07b1: Waiting
+30a013060aff: Waiting
+6522a2852221: Waiting
+56a69ef72608: Waiting
+6f7043721c9b: Waiting
+a933681cf349: Waiting
+f49d20b92dc8: Waiting
+630e4f1da707: Waiting
+9780f6d83e45: Waiting
+fe342cfe5c83: Waiting
+8d2fa296514e: Layer already exists
+cf7936b2dfc4: Layer already exists
+8bf53806f0ac: Layer already exists
+e3d01010f853: Layer already exists
+dfb174dc936e: Layer already exists
+30a013060aff: Layer already exists
+0f440a88fc4e: Layer already exists
+21e23f3f07b1: Layer already exists
+56a69ef72608: Layer already exists
+6522a2852221: Layer already exists
+6f7043721c9b: Layer already exists
+a933681cf349: Layer already exists
+f49d20b92dc8: Layer already exists
+fe342cfe5c83: Layer already exists
+630e4f1da707: Layer already exists
+9780f6d83e45: Layer already exists
+20beb0639a52: Layer already exists
+7365d6a046b9: Layer already exists
+64a735a232c6: Layer already exists
+dev-61842-a0e2a9a5: digest: sha256:657f87e25ddd1b882cbae3a54379d4aeca452906f79f25a45715302ce4048b91 size: 4518
+16cef1404529: Preparing
+441d5a870e68: Preparing
+846c40a24316: Preparing
+cf7936b2dfc4: Preparing
+dfb174dc936e: Preparing
+dfb174dc936e: Preparing
+64a735a232c6: Preparing
+7365d6a046b9: Preparing
+20beb0639a52: Preparing
+0f440a88fc4e: Preparing
+21e23f3f07b1: Preparing
+30a013060aff: Preparing
+6522a2852221: Preparing
+56a69ef72608: Preparing
+6f7043721c9b: Preparing
+a933681cf349: Preparing
+f49d20b92dc8: Preparing
+fe342cfe5c83: Preparing
+630e4f1da707: Preparing
+9780f6d83e45: Preparing
+cf7936b2dfc4: Layer already exists
+dfb174dc936e: Waiting
+64a735a232c6: Waiting
+7365d6a046b9: Waiting
+20beb0639a52: Waiting
+0f440a88fc4e: Waiting
+21e23f3f07b1: Waiting
+30a013060aff: Waiting
+6522a2852221: Waiting
+56a69ef72608: Waiting
+6f7043721c9b: Waiting
+a933681cf349: Waiting
+f49d20b92dc8: Waiting
+fe342cfe5c83: Waiting
+630e4f1da707: Waiting
+9780f6d83e45: Waiting
+21e23f3f07b1: Layer already exists
+dfb174dc936e: Layer already exists
+64a735a232c6: Layer already exists
+7365d6a046b9: Layer already exists
+20beb0639a52: Layer already exists
+0f440a88fc4e: Layer already exists
+30a013060aff: Layer already exists
+6522a2852221: Layer already exists
+56a69ef72608: Layer already exists
+6f7043721c9b: Layer already exists
+a933681cf349: Layer already exists
+f49d20b92dc8: Layer already exists
+fe342cfe5c83: Layer already exists
+630e4f1da707: Layer already exists
+9780f6d83e45: Layer already exists
+16cef1404529: Pushed
+846c40a24316: Pushed
+441d5a870e68: Pushed
+dev-61888-9a4cfa2a: digest: sha256:882443cbce9eb08258477b2ea5a32c12c66613cbd83f2660c5e9e812d0ed1d21 size: 4519
+16cef1404529: Preparing
+441d5a870e68: Preparing
+846c40a24316: Preparing
+cf7936b2dfc4: Preparing
+dfb174dc936e: Preparing
+dfb174dc936e: Preparing
+64a735a232c6: Preparing
+7365d6a046b9: Preparing
+20beb0639a52: Preparing
+0f440a88fc4e: Preparing
+21e23f3f07b1: Preparing
+30a013060aff: Preparing
+6522a2852221: Preparing
+56a69ef72608: Preparing
+6f7043721c9b: Preparing
+a933681cf349: Preparing
+f49d20b92dc8: Preparing
+fe342cfe5c83: Preparing
+630e4f1da707: Preparing
+9780f6d83e45: Preparing
+846c40a24316: Layer already exists
+30a013060aff: Waiting
+6522a2852221: Waiting
+56a69ef72608: Waiting
+cf7936b2dfc4: Layer already exists
+6f7043721c9b: Waiting
+dfb174dc936e: Waiting
+a933681cf349: Waiting
+f49d20b92dc8: Waiting
+64a735a232c6: Waiting
+7365d6a046b9: Waiting
+20beb0639a52: Waiting
+0f440a88fc4e: Waiting
+fe342cfe5c83: Waiting
+21e23f3f07b1: Waiting
+630e4f1da707: Waiting
+9780f6d83e45: Waiting
+30a013060aff: Layer already exists
+6522a2852221: Layer already exists
+56a69ef72608: Layer already exists
+6f7043721c9b: Layer already exists
+a933681cf349: Layer already exists
+f49d20b92dc8: Layer already exists
+fe342cfe5c83: Layer already exists
+630e4f1da707: Layer already exists
+9780f6d83e45: Layer already exists
+441d5a870e68: Layer already exists
+7365d6a046b9: Layer already exists
+dfb174dc936e: Layer already exists
+64a735a232c6: Layer already exists
+0f440a88fc4e: Layer already exists
+20beb0639a52: Layer already exists
+21e23f3f07b1: Layer already exists
+16cef1404529: Layer already exists
+latest: digest: sha256:882443cbce9eb08258477b2ea5a32c12c66613cbd83f2660c5e9e812d0ed1d21 size: 4519
+$ docker push $CI_REGISTRY_IMAGE:$TAG
+The push refers to repository [git-registry.globerce.com/trafficwave/fastcash_back]
+16cef1404529: Preparing
+441d5a870e68: Preparing
+846c40a24316: Preparing
+cf7936b2dfc4: Preparing
+dfb174dc936e: Preparing
+dfb174dc936e: Preparing
+64a735a232c6: Preparing
+7365d6a046b9: Preparing
+20beb0639a52: Preparing
+0f440a88fc4e: Preparing
+21e23f3f07b1: Preparing
+30a013060aff: Preparing
+6522a2852221: Preparing
+56a69ef72608: Preparing
+6f7043721c9b: Preparing
+a933681cf349: Preparing
+f49d20b92dc8: Preparing
+fe342cfe5c83: Preparing
+630e4f1da707: Preparing
+9780f6d83e45: Preparing
+64a735a232c6: Waiting
+7365d6a046b9: Waiting
+20beb0639a52: Waiting
+0f440a88fc4e: Waiting
+dfb174dc936e: Waiting
+f49d20b92dc8: Waiting
+a933681cf349: Waiting
+21e23f3f07b1: Waiting
+30a013060aff: Waiting
+6522a2852221: Waiting
+6f7043721c9b: Waiting
+fe342cfe5c83: Waiting
+56a69ef72608: Waiting
+630e4f1da707: Waiting
+9780f6d83e45: Waiting
+16cef1404529: Layer already exists
+cf7936b2dfc4: Layer already exists
+846c40a24316: Layer already exists
+441d5a870e68: Layer already exists
+dfb174dc936e: Layer already exists
+64a735a232c6: Layer already exists
+7365d6a046b9: Layer already exists
+20beb0639a52: Layer already exists
+21e23f3f07b1: Layer already exists
+0f440a88fc4e: Layer already exists
+30a013060aff: Layer already exists
+6f7043721c9b: Layer already exists
+56a69ef72608: Layer already exists
+6522a2852221: Layer already exists
+a933681cf349: Layer already exists
+fe342cfe5c83: Layer already exists
+f49d20b92dc8: Layer already exists
+630e4f1da707: Layer already exists
+9780f6d83e45: Layer already exists
+dev-61888-9a4cfa2a: digest: sha256:882443cbce9eb08258477b2ea5a32c12c66613cbd83f2660c5e9e812d0ed1d21 size: 4519
+$ docker rmi $CI_PROJECT_PATH
+Untagged: trafficwave/fastcash_back:latest
+$ docker rmi $CI_REGISTRY_IMAGE
+Untagged: git-registry.globerce.com/trafficwave/fastcash_back:latest
+$ docker rmi $CI_REGISTRY_IMAGE:$TAG
+Untagged: git-registry.globerce.com/trafficwave/fastcash_back:dev-61888-9a4cfa2a
+Untagged: git-registry.globerce.com/trafficwave/fastcash_back@sha256:882443cbce9eb08258477b2ea5a32c12c66613cbd83f2660c5e9e812d0ed1d21
+Deleted: sha256:94ddddf75022a2db0c64d389bac404ffe06946752023ec4100d114bd0450b41b
+Deleted: sha256:f50646fc4419e6170f752073160fb93e065c084134ec649aec3de974cf68863a
+Deleted: sha256:b6965b63c9271bc4a1f0be6bfc73b79f263d3120fd88fadbfd4d5d547e6b4128
+Deleted: sha256:1666e3ddfd8faf759ab8cc716284e7c85aba7bf14ad5bf0247b50729b5ae2cad
+Deleted: sha256:678673aa269635c250cacefc5e7ed936ed6f27d7e7898b47ce64eeb136cd1f8d
+Deleted: sha256:e2f1492a4c6d5f23ca762166cfa08a734502b9a602a85f57406d1cbe0f5acd45
+Deleted: sha256:ffe02d9224ecf31f2975abcaf490bb6575097dd8e050fa6b5a2d7f9a06eb3375
+Cleaning up file based variables
+00:01
+Job succeeded
